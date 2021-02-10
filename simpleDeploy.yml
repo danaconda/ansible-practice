@@ -13,8 +13,12 @@
 
   - name: Upload web page
     copy: src={{ source_file }} dest={{ destin_file }} mode=055
+    notify: Restart Apache service   
 
   - name: Start and enable Apache service
     service: name=httpd state=started enabled=yes
 
+  handlers:
+  - name: Restart Apache service
+    service: name=httpd state=restarted
 
