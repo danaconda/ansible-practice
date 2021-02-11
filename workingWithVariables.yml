@@ -1,0 +1,44 @@
+---
+- name: Playbook for working with variables
+  hosts: all
+
+  vars:
+    message: "Hello, World!"
+    secret: LFZXCVBDJAFKLVBNMRTYUIJSDLFKJSKLDJDSKLJF
+  
+  tasks:
+
+  - name: Print secret variable
+    debug: 
+      var: secret
+  
+  - name: Print message + variable
+    debug:
+      msg: "Secret is {{ secret }}"
+
+  - name: Print variables from inventory
+    debug:
+      msg: "Owner of this server {{ owner }}"
+
+  - name: Print concatinate variables
+    set_fact: 
+      full_message: "{{ message }}  from {{ owner }}"
+
+  - debug:
+      var: full_message
+
+  - name: Print distribution variable from module setup
+    debug:
+      var: ansible_distribution
+
+  - name: Save command output
+    shell: uptime
+    register: result
+
+  - name: Print saved result
+    debug:
+      var: result
+
+  - name: Print message with part of result of command
+    debug:
+      msg: "uptime on {{ ansible_os_family }} is {{ result.stdout }}"
