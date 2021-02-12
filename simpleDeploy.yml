@@ -1,6 +1,6 @@
 ---
 - name: install Apache and upload simple web page
-  hosts: linux1
+  hosts: all
   become: yes
 
   vars:
@@ -8,17 +8,41 @@
     destin_file: /var/www/html
 
   tasks:
-  - name: Install Apache package 
-    yum: name=httpd state=latest
+  - name: Print linux distribution family
+    debug: var=ansible_os_family
 
-  - name: Upload web page
-    copy: src={{ source_file }} dest={{ destin_file }} mode=055
-    notify: Restart Apache service   
 
-  - name: Start and enable Apache service
-    service: name=httpd state=started enabled=yes
+  - block: # RedHat block   
+
+    - name: Install Apache package on RedHat
+      yum: name=httpd state=latest
+
+    - name: Upload web page
+      copy: src={{ source_file }} dest={{ destin_file }} mode=055
+      notify: Restart Apache service RedHat
+   
+    - name: Start and enable Apache service on RedHat
+      service: name=httpd state=started enabled=yes
+
+    when: ansible_os_family == "RedHat"
+
+  - block: # Debian block
+
+    - name: Install Apache package on Debian
+      apt: name=apache2 state=latest
+
+    - name: Upload web page
+      copy: src={{ source_file }} dest={{ destin_file }} mode=055
+      notify: Restart Apache service Debian
+
+    - name: Start and enable Apache service on Debian
+      service: name=apache2 state=started enabled=yes
+
+    when: ansible_os_family == "Debian"
 
   handlers:
-  - name: Restart Apache service
+  - name: Restart Apache service RedHat
     service: name=httpd state=restarted
 
+  - name: Restart Apache service Debian
+    service: name=apache2 state=restarted
