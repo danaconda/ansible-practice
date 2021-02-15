@@ -34,13 +34,8 @@
 
 
   - name: Upload web page
-    copy: src={{ source_folder }}/{{ item }} dest={{ destin_folder }} mode=055
-    loop:
-       - "index.html"
-       - "arabic.jpg"
-       - "bahamas.jpg"
-       - "jordan.jpg"
-       - "newzeland.jpg"
+    copy: src={{ item }} dest={{ destin_folder }} mode=055
+    with_fileglob: "{{ source_folder }}/*.*"
     notify: 
        - Restart Apache service RedHat
        - Restart Apache service Debian
