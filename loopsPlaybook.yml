@@ -1,0 +1,29 @@
+---
+- name: Loops playbook
+  hosts: linux1
+  become: yes
+
+  tasks:
+  - name: Say hello to all
+    debug: 
+      msg: "Hello {{ item }}"
+    loop: # since ansible version 2.5, after => with_items
+      - "Maria"
+      - "Anna"
+      - "Peter" 
+  - name: Loop until example
+    shell: echo -n Z >> myfile.txt && cat myfile.txt
+    register: output
+    delay: 2 # make delay 2 seconds
+    retries: 10
+    until: output.stdout.find("ZZZZ") == false
+
+  - name: Print Zs
+    debug: var=output.stdout
+
+  - name: Install few packages
+    yum: name={{ item }} state=installed
+    loop:
+      - vim
+      - htop
+      - byobu  
