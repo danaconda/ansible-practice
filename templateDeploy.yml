@@ -1,0 +1,55 @@
+---
+- name: install Apache and upload simple web page
+  hosts: all
+  become: yes
+
+  vars:
+    source_folder: ./for_deploy
+    destin_folder: /var/www/html
+
+  tasks:
+  - name: Print linux distribution family
+    debug: var=ansible_os_family
+
+
+  - block: # RedHat block   
+
+    - name: Install Apache package on RedHat
+      yum: name=httpd state=latest
+   
+    - name: Start and enable Apache service on RedHat
+      service: name=httpd state=started enabled=yes
+
+    when: ansible_os_family == "RedHat"
+
+  - block: # Debian block
+
+    - name: Install Apache package on Debian
+      apt: name=apache2 state=latest
+
+    - name: Start and enable Apache service on Debian
+      service: name=apache2 state=started enabled=yes
+
+    when: ansible_os_family == "Debian"
+
+  - name: Upload files on servers
+    copy: src={{ item }} dest={{ destin_folder }} mode=055
+    with_fileglob: "{{ source_folder }}/*.*"
+    notify: 
+       - Restart Apache service RedHat
+       - Restart Apache service Debian
+
+  - name: Generate index.html file
+    template: src={{ source_folder }}/index.j2 dest={{ destin_folder }}/index.html mode=0555
+    notify:
+       - Restart Apache service RedHat
+       - Restart Apache service Debian
+
+  handlers:
+  - name: Restart Apache service RedHat
+    service: name=httpd state=restarted
+    when: ansible_os_family == "RedHat"
+
+  - name: Restart Apache service Debian
+    service: name=apache2 state=restarted
+    when: ansible_os_family == "Debian"
