@@ -1,0 +1,21 @@
+---
+- name: Include/Import Playbook
+  hosts: all
+  become: yes
+
+  vars:
+    mytext: "Simple string"
+    file_name: "file_name"  
+
+  tasks:
+  - name: Ping test
+    ping:
+
+  - name: Create folders
+    include: create_folders.yml
+
+  - name: Create file with default variables
+    include: create_file.yml
+
+  - name: Create file with own variables
+    include: create_file.yml mytext="Other simple string" file_name="other_file"
