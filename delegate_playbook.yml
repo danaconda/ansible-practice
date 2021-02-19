@@ -1,0 +1,46 @@
+---
+- name: Delegate playbook
+  hosts: all
+  become: yes
+
+  vars:
+    text: "Simple string"
+
+  tasks:
+  - name: Create first file
+    copy:
+      dest: /home/first_file.txt
+      content: |
+        This is first file
+        Second line of text
+        and variable is {{ text }}
+    delegate_to: linux2
+   
+  - name: Create second file
+    copy:
+      dest: /home/second_file.txt
+      content: |
+        This is second file
+        Second line of text
+        Third is {{ text }}
+  
+  - name: Example of using delegate, for example unregistred servers from other server (emulated)
+    shell: echo This server {{ inventory_hostname }} will be unregistered from load balancer, node name is {{ ansible_nodename }} >> /root/ansible/log.log
+    delegate_to: 127.0.0.1
+    
+  - name: Reboot servers
+    shell: sleep 3 && reboot now
+    async: 1 
+    poll: 0
+
+  - name: Wait till servers up
+    wait_for:
+      host: "{{ inventory_hostname }}"
+      state: started
+      delay: 5
+      timeout: 40
+    delegate_to: 127.0.0.1
+
+  - name: Exec on just one server
+    shell: echo Run command
+    run_once: true
