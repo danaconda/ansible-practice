@@ -1,22 +1,19 @@
 ---
 - name: Error handling
   hosts: all
+  any_errors_fatal: true
   become: yes
 
 
   tasks:
   - name: First task
-    yum: name=treeeeee state=latest
+    yum: name=treeee state=latest
     ignore_errors: yes
 
   - name: Second task
-    shell: echo Second task!
+    shell: echo Second {{ ansible_os_family }}
     register: result
-#    failed_when: "'task' in result.stdout"
-    failed_when: result.rc == 0
-
-  - debug:
-      var: results
+    failed_when: "'Hat' in result.stdout"
 
   - name: Third task
     shell: echo Third task!
