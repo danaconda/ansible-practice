@@ -1,0 +1,24 @@
+---
+- name: Error handling
+  hosts: all
+  become: yes
+
+
+  tasks:
+  - name: First task
+    yum: name=treeeeee state=latest
+    ignore_errors: yes
+
+  - name: Second task
+    shell: echo Second task!
+    register: result
+#    failed_when: "'task' in result.stdout"
+    failed_when: result.rc == 0
+
+  - debug:
+      var: results
+
+  - name: Third task
+    shell: echo Third task!
+
+
