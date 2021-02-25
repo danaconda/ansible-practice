@@ -8,6 +8,7 @@ It is lika a summary of all lections.
 For use playbooks you will need ansible and at least two nodes. 
 And edit inventory file. Just change ip addressess.
 For run playbooks in most cases enough type command:
+    
     ansible-playbook <yml-file>
 
 ## covered topics
