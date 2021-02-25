@@ -1,0 +1,27 @@
+---
+- name: Vault playbook
+  hosts: all
+  become: yes
+
+  vars: 
+    admin_passwd: !vault |
+                    $ANSIBLE_VAULT;1.1;AES256
+                    31356437303266636364653064303431393534633364396563343134623630333835613636383436
+                    3534346461643231633463343239623537313632333364320a663762633936383733663530323430
+                    31636530616536306439363366353633373065366337326366313339656337343334346139383339
+                    3838333561386133350a366335303237363861663031313236343465343930316162666661393639
+                    33363739316537633733666435613433346134666561333465616434653261373037
+
+  tasks:
+  - name: Install package tree
+    yum: name=tree state=latest
+
+  - name: Create config file
+    copy:
+      dest: "/home/user/.myconfig.conf"
+      content: | 
+        port    = 9093
+        log_rot = 7d # 7 days
+        home    = /opt/kafka/bin/
+        user    = admin
+        password= {{ admin_passwd }} 
